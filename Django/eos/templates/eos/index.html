@@ -1,0 +1,69 @@
+<!-- eos/templates/eos/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>УС</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'eos/css/main.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+      .custom-btn-size {
+        padding: 0.25rem 0.5rem !important;
+        font-size: 1rem !important;
+      }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>Панель управления студентами</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav class="nav">
+            <div class="nav-links">
+                <a href="/" class="active"><i class="fas fa-users"></i> Студенты</a>
+                <a href="{% url 'create_student' %}"><i class="fas fa-user-plus"></i> Создать студента</a>
+                <a href="{% url 'run_analysis' %}"><i class="fas fa-chart-bar"></i> Анализ данных</a>
+            </div>
+        </nav>
+
+        <div class="search-bar">
+            <form method="get" action="{% url 'student_list' %}">
+                <input type="text" name="q" placeholder="Введите имя или ID">
+                <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i>Поиск</button>
+            </form>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>ФИО</th>
+                        <th>Возраст</th>
+                        <th>Специальность</th>
+                        <th>Курс</th>
+                        <th>Действие</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for student in students %}
+                    <tr>
+                        <td>{{ student.id }}</td>
+                        <td>{{ student.name }}</td>
+                        <td>{{ student.age }}</td>
+                        <td>{{ student.major }}</td>
+                        <td>{{ student.year }}</td>
+                        <td><a href="{% url 'edit_student' student.id %}" class="btn btn-primary custom-btn-size"><i class="fas fa-edit"></i>Изменить</a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

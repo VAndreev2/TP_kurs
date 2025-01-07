@@ -1,0 +1,79 @@
+<!-- eos/templates/eos/analysis_results.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>УС</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'eos/css/main.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <style>
+        .custom-margin-top {
+            margin-top: 20px;
+        }
+        .custom-margin-bottom {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>Анализ данных</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav class="nav">
+            <div class="nav-links">
+                <a href="/"><i class="fas fa-users"></i> Студенты</a>
+                <a href="{% url 'create_student' %}"><i class="fas fa-user-plus"></i> Создать студента</a>
+                <a href="{% url 'run_analysis' %}" class="active"><i class="fas fa-chart-bar"></i> Анализ данных</a>
+            </div>
+        </nav>
+
+        <div class="analytics-container">
+            {% for module, result in results.items %}
+                <h2>{{ result.name }}</h2>
+                <img src="data:image/png;base64,{{ result.plot }}" alt="{{ result.name }}">
+            {% endfor %}
+        </div>
+
+        <h2 class="custom-margin-bottom">Статистика</h2>
+        <table class="table table-bordered table-hover custom-margin-bottom">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Метрика</th>
+                    <th>Значение</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Сумма пропущенных часов</td>
+                    <td>{{ results.statistics.sum }}</td>
+                </tr>
+                <tr>
+                    <td>Среднее количество пропущенных часов</td>
+                    <td>{{ results.statistics.mean }}</td>
+                </tr>
+                <tr>
+                    <td>Медианное количество пропущенных часов</td>
+                    <td>{{ results.statistics.median }}</td>
+                </tr>
+                <tr>
+                    <td>Максимальное количество пропущенных часов</td>
+                    <td>{{ results.statistics.max }}</td>
+                </tr>
+                <tr>
+                    <td>Минимальное количество пропущенных часов</td>
+                    <td>{{ results.statistics.min }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <a href="{% url 'student_list' %}" class="btn btn-primary custom-margin-top"><i class="fas fa-arrow-left"></i> Назад к списку студентов</a>
+    </div>
+</body>
+</html>

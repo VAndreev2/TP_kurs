@@ -1,0 +1,11 @@
+django
+psycopg
+dj-database-url
+gunicorn
+whitenoise
+django-heroku
+pytz
+sqlparse
+pyyaml
+matplotlib
+pandas

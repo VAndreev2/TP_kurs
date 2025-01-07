@@ -1,0 +1,100 @@
+
+<!-- eos/templates/eos/edit_student.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>УС</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'eos/css/main.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        label + input {
+      margin-bottom: 1.5rem !important;
+    }
+
+    label {
+      display: block !important;
+      margin-bottom: 0.5rem !important;
+      font-weight: 500 !important;
+      color: var(--text-color) !important;
+    }
+
+    input {
+      width: 100% !important;
+      padding: 0.8rem !important;
+      border: 1px solid var(--border-color) !important;
+      border-radius: 4px !important;
+      font-size: 1rem !important;
+      transition: border-color 0.3s ease !important;
+    }
+
+    input:focus {
+      outline: none !important;
+      border-color: var(--secondary-color) !important;
+    }
+
+    input[type="checkbox"] {
+      width: 10px; /* Увеличение ширины */
+      height: 10px; /* Увеличение высоты */
+      transform: scale(1.5); /* Увеличение масштаба */
+      margin: 0.5rem; /* Добавление отступов */
+      cursor: pointer; /* Удобство для пользователя */
+    }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>Изменение студента</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav class="nav">
+            <div class="nav-links">
+                <a href="/"><i class="fas fa-users"></i> Студенты</a>
+                <a href="{% url 'create_student' %}"><i class="fas fa-user-plus"></i> Создать студента</a>
+                <a href="{% url 'run_analysis' %}"><i class="fas fa-chart-bar"></i> Анализ данных</a>
+            </div>
+        </nav>
+        <div class="form-container">
+             <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+
+                <h2>Успеваемость</h2>
+                {{ formset.management_form }}
+                <div class="table-container" style="margin: 1rem 0 2rem 0;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Дисциплина</th>
+                                <th>Баллы</th>
+                                <th>Удалить</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                         {% for grade_form in formset %}
+                                        {{ grade_form.id }}
+                                        <tr>
+                                            <td>{{ grade_form.subject }}</td>
+                                            <td>{{ grade_form.score }}</td>
+                                            <td>{{ grade_form.DELETE }}</td>
+                                        </tr>
+                                    {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Сохранить</button>
+                <a href="{% url 'view_student' student_id %}" class="btn btn-primary"><i class="fas fa-eye"></i> Как видит студент</a>
+                <a href="{% url 'student_list' %}" class="btn btn-danger"><i class="fas fa-times"></i> Отмена</a>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

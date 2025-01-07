@@ -1,0 +1,65 @@
+<!-- eos/templates/eos/create_student.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>УС</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'eos/css/main.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        label + input {
+      margin-bottom: 1.5rem !important;
+    }
+
+    label {
+      display: block !important;
+      margin-bottom: 0.5rem !important;
+      font-weight: 500 !important;
+      color: var(--text-color) !important;
+    }
+
+    input {
+      width: 100% !important;
+      padding: 0.8rem !important;
+      border: 1px solid var(--border-color) !important;
+      border-radius: 4px !important;
+      font-size: 1rem !important;
+      transition: border-color 0.3s ease !important;
+    }
+
+    input:focus {
+      outline: none !important;
+      border-color: var(--secondary-color) !important;
+    }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>Создать нового студента</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav class="nav">
+            <div class="nav-links">
+                <a href="/"><i class="fas fa-users"></i> Студенты</a>
+                <a href="{% url 'create_student' %}" class="active"><i class="fas fa-user-plus"></i> Создать студента</a>
+                <a href="{% url 'run_analysis' %}"><i class="fas fa-chart-bar"></i> Анализ данных</a>
+            </div>
+        </nav>
+
+    <div class="form-container">
+         <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+                <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Создать</button>
+                <a href="{% url 'student_list' %}" class="btn btn-danger"><i class="fas fa-times"></i> Отменить</a>
+         </form>
+    </div>
+    </div>
+</body>
+</html>

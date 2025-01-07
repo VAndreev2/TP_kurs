@@ -1,0 +1,104 @@
+<!-- eos/templates/eos/view_student.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>УС</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'eos/css/main.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .form-container {
+          background-color: white;
+          padding: 2rem;
+          border-radius: 8px;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+          margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+          display: block;
+          margin-bottom: 0.5rem;
+          font-weight: 500;
+          color: var(--text-color);
+        }
+
+        .form-group input {
+          width: 100%;
+          padding: 0.8rem;
+          border: 1px solid var(--border-color);
+          border-radius: 4px;
+          font-size: 1rem;
+          transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+          outline: none;
+          border-color: var(--secondary-color);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>Личный кабинет студента</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="form-container">
+            <div class="form-group">
+                <label><strong>Имя</strong></label>
+                <p>{{ student.name }}</p>
+            </div>
+            <div class="form-group">
+                <label><strong>Возраст</strong></label>
+                <p>{{ student.age }}</p>
+            </div>
+            <div class="form-group">
+                <label><strong>Email:</strong></label>
+                <p>{{ student.email }}</p>
+            </div>
+            <div class="form-group">
+                <label><strong>Специальность</strong></label>
+                <p>{{ student.major }}</p>
+            </div>
+            <div class="form-group">
+                <label><strong>Курс</strong></label>
+                <p>{{ student.year }}</p>
+            </div>
+            <div class="form-group">
+                <label><strong>Пропущенные часы</strong></label>
+                <p>{{ student.missed_hours }}</p>
+            </div>
+
+            <h2>Успеваемость</h2>
+            <div class="table-container" style="margin: 1rem 0 2rem 0;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Дисциплина</th>
+                            <th>Баллы</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for grade in grades %}
+                            <tr>
+                                <td>{{ grade.subject }}</td>
+                                <td>{{ grade.score }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <a href="{% url 'edit_student' student_id %}" class="btn btn-primary"><i class="fas fa-edit"></i> Режим редактирования</a>
+            <a href="{% url 'student_list' %}" class="btn btn-primary"><i class="fas fa-list"></i> Список студентов</a>
+        </div>
+    </div>
+</body>
+</html>
