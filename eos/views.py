@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.forms import inlineformset_factory
 from .models import Student, StudentGrade
 from .forms import StudentForm, StudentEditForm, StudentGradeForm, StudentGradeFormSet
-from .analytics import AnalyticsEngine, PerformanceAnalytics, MajorAnalytics, YearAttendanceAnalytics, BarPlotStrategy, LinePlotStrategy
+from .analytics import AnalyticsEngine, PerformanceAnalytics, MajorAnalytics, YearAttendanceAnalytics, BarPlotStrategy
 from .analytics_service import AnalyticsService
 
 def student_list(request):
