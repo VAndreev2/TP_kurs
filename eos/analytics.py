@@ -7,7 +7,8 @@ import matplotlib.pyplot as plt
 import io
 import base64
 from threading import Lock
-from .analytics_service import AnalyticsService  # Импортируем новый сервис
+from .analytics_service import AnalyticsService
+
 
 # Базовый интерфейс для построения графиков
 class PlotStrategy(ABC):
@@ -15,6 +16,7 @@ class PlotStrategy(ABC):
     def plot(self, data: Dict) -> str:
         """Создаёт график и возвращает его в виде base64 строки."""
         pass
+
 
 # Стратегия для построения столбчатых диаграмм
 class BarPlotStrategy(PlotStrategy):
@@ -38,28 +40,26 @@ class BarPlotStrategy(PlotStrategy):
 
         return base64.b64encode(image_png).decode('utf-8')
 
+
 # Базовый интерфейс для всех аналитических модулей
 class AnalyticsModule(ABC):
     name = ""
+
+    def __init__(self, plot_strategy: PlotStrategy):
+        self.plot_strategy = plot_strategy
 
     @abstractmethod
     def analyze(self, data: List[Dict]) -> Dict:
         """Выполняет анализ данных."""
         pass
 
-    def __init__(self, plot_strategy: PlotStrategy):
-        self.plot_strategy = plot_strategy
-
-    def plot(self, data: Dict) -> str:
+    def plot_graph(self, data: Dict) -> str:
         return self.plot_strategy.plot(data)
+
 
 # Модуль аналитики успеваемости
 class PerformanceAnalytics(AnalyticsModule):
     name = "Анализ успеваемости"
-
-    def __init__(self):
-        super().__init__(BarPlotStrategy(
-            xlabel='Дисциплина', ylabel='Средний балл', title='Средний балл по дисциплинам'))
 
     def analyze(self, data: List[Dict]) -> Dict:
         subject_averages = {}
@@ -73,13 +73,10 @@ class PerformanceAnalytics(AnalyticsModule):
 
         return {subject: sum(scores) / len(scores) for subject, scores in subject_averages.items()}
 
+
 # Модуль аналитики направлений
 class MajorAnalytics(AnalyticsModule):
     name = "Анализ направлений"
-
-    def __init__(self):
-        super().__init__(BarPlotStrategy(
-            xlabel='Направления', ylabel='Количество студентов', title='Распределение студентов по направлениям'))
 
     def analyze(self, data: List[Dict]) -> Dict:
         major_counts = {}
@@ -90,16 +87,13 @@ class MajorAnalytics(AnalyticsModule):
             major_counts[major] += 1
         return major_counts
 
+
 # Модуль аналитики посещаемости по годам обучения
 class YearAttendanceAnalytics(AnalyticsModule):
     name = "Анализ посещаемости"
 
-    def __init__(self):
-        self.plot_strategy = BarPlotStrategy(
-            xlabel='Год', ylabel='Пропущенные часы', title='Анализ посещаемости по годам обучения (среднее значение)')
-
     def analyze(self, data: List[Dict]) -> Dict:
-        """Анализ посещаемости студентов по годам обучения."""
+        """Выполняет анализ данных и возвращает средние пропущенные часы по годам."""
         year_attendance = {}
         for student_data in data:
             year = student_data['year']
@@ -108,20 +102,10 @@ class YearAttendanceAnalytics(AnalyticsModule):
                 year_attendance[year] = []
             year_attendance[year].append(missed_hours)
 
-        return {year: {"total_missed_hours": sum(hours), "average_missed_hours": sum(hours) / len(hours)} for year, hours in year_attendance.items()}
-
-    def plot(self, data: Dict) -> str:
-        years = list(data.keys())
-        total_missed_hours = [info['total_missed_hours'] for info in data.values()]
-        average_missed_hours = [info['average_missed_hours'] for info in data.values()]
-
-        # Используем стратегию для построения графика
-        return self.plot_strategy.plot(dict(zip(years, average_missed_hours)))
+        # Средние пропущенные часы по годам
+        return {year: sum(hours) / len(hours) for year, hours in year_attendance.items()}
 
 
-
-
-# Улучшенная реализация Singleton для AnalyticsEngine
 class AnalyticsEngine:
     _instance = None
     _lock = Lock()
@@ -135,9 +119,8 @@ class AnalyticsEngine:
     def register_module(self, module: AnalyticsModule):
         self.modules.append(module)
 
-    def run_analysis(self, students: List[Student], column_name: str) -> Dict:
-        results = {}
-        data = [
+    def generate_student_data(self, students: List[Student]) -> List[Dict]:
+        return [
             {
                 "id": student.id,
                 "name": student.name,
@@ -151,19 +134,31 @@ class AnalyticsEngine:
             for student in students
         ]
 
-        # Используем AnalyticsService для вычисления статистики
+    def calculate_statistics(self, data: List[Dict], column_name: str) -> Dict:
         analytics_service = AnalyticsService(data)
-        statistics = analytics_service.calculate_statistics(column_name)
+        return analytics_service.calculate_statistics(column_name)
 
+    def analyze_modules(self, data: List[Dict]) -> Dict:
+        results = {}
         for module in self.modules:
             module_result = module.analyze(data)
             results[module.name] = {
                 'result': module_result,
-                'plot': module.plot(module_result),
+                'plot': module.plot_graph(module_result),
                 'name': module.name
             }
-
-        # Добавляем статистику в результаты
-        results['statistics'] = statistics
-
         return results
+    def run_analysis(self, students: List[Student], column_name: str) -> Dict:
+        # Генерация данных студентов
+        data = self.generate_student_data(students)
+
+        # Вычисление статистики
+        statistics = self.calculate_statistics(data, column_name)
+
+        # Анализ с использованием модулей
+        module_results = self.analyze_modules(data)
+
+        # Добавление статистики в результаты
+        module_results['statistics'] = statistics
+
+        return module_results

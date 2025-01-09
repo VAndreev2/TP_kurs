@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.forms import inlineformset_factory
 from .models import Student, StudentGrade
 from .forms import StudentForm, StudentEditForm, StudentGradeForm, StudentGradeFormSet
-from .analytics import AnalyticsEngine, PerformanceAnalytics, MajorAnalytics, YearAttendanceAnalytics
+from .analytics import AnalyticsEngine, PerformanceAnalytics, MajorAnalytics, YearAttendanceAnalytics, BarPlotStrategy, LinePlotStrategy
 from .analytics_service import AnalyticsService
 
 def student_list(request):
@@ -21,9 +21,12 @@ def student_list(request):
 def run_analysis(request):
     students = Student.objects.all()
     engine = AnalyticsEngine()
-    engine.register_module(PerformanceAnalytics())
-    engine.register_module(MajorAnalytics())
-    engine.register_module(YearAttendanceAnalytics())
+    engine.register_module(PerformanceAnalytics(plot_strategy=BarPlotStrategy(
+            xlabel='Дисциплина', ylabel='Средний балл', title='Средний балл по дисциплинам')))
+    engine.register_module(MajorAnalytics(plot_strategy=BarPlotStrategy(
+            xlabel="Направления", ylabel="Количество студентов", title="Распределение студентов по направлениям")))
+    engine.register_module(YearAttendanceAnalytics(plot_strategy=BarPlotStrategy(
+            xlabel='Курс обучения', ylabel='Пропущенные часы', title='Анализ посещаемости по годам обучения (среднее значение)')))
 
     analysis_results = engine.run_analysis(students, 'missed_hours')
     return render(request, 'eos/analysis_results.html', {'results': analysis_results})
